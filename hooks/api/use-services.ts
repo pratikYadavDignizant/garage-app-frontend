@@ -2,12 +2,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/axios';
 import { toast } from 'sonner';
 
+export interface ServiceItem {
+    service: string;
+    cost: number;
+}
+
 export interface Service {
     id: string;
     vehicleId: string;
     serviceDate: string;
     nextServiceDate: string;
     intervalMonths: 1 | 2 | 3 | 6;
+    serviceItems: ServiceItem[];
     notes?: string;
     vehicle?: {
         id: string;
@@ -28,6 +34,11 @@ export interface Service {
             };
         };
     };
+}
+
+// Helper function to calculate total cost
+export const calculateTotalCost = (serviceItems: ServiceItem[]): number => {
+    return serviceItems.reduce((total, item) => total + item.cost, 0);
 }
 
 export function useServices(vehicleId?: string) {

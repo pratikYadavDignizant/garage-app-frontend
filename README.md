@@ -4,14 +4,17 @@ A modern, high-performance web application designed for garage owners to efficie
 
 ## ✨ Key Features
 
-- **🔐 Secure OTP Authentication**: Firebase-powered phone authentication for seamless, password-free login
+- **🔐 Dual Authentication System**:
+  - Firebase OTP authentication for garage users (password-free)
+  - Email/password authentication for admin users
 - **📊 Real-time Dashboard**: Comprehensive overview of garage operations with KPIs and analytics
 - **👥 Customer Management**: Centralized database with full CRUD operations and export capabilities
 - **🚙 Vehicle Tracking**: Complete vehicle history, service records, and maintenance schedules
 - **🔧 Service Recording**: Log service details with automatic next-service-date calculations
+- **🧾 Invoice Generation**: Professional, printable invoices with GST calculations and service breakdowns
 - **📱 WhatsApp Integration**: Automated service reminders via WhatsApp Business API
 - **📝 Template Management**: Customizable message templates for different service types
-- **📈 Analytics \u0026 Reports**: Service trends, reminder tracking, and performance metrics
+- **📈 Analytics & Reports**: Service trends, reminder tracking, and performance metrics
 
 ## 🛠️ Tech Stack
 
@@ -154,6 +157,8 @@ garage-app-web/
 │ │ ├── reminders/ # Reminder management
 │ │ ├── templates/ # Message templates
 │ │ └── settings/ # Settings page
+│ ├── invoice/ # Invoice generation
+│ │ └── [id]/ # Dynamic invoice page by service ID
 │ ├── layout.tsx # Root layout
 │ ├── page.tsx # Home page
 │ ├── error.tsx # Error boundary
@@ -216,6 +221,8 @@ The application can be deployed to any platform that supports Next.js:
 ## 📚 Documentation
 
 - **[Architecture Guide](./docs/ARCHITECTURE.md)** - System architecture and design patterns
+- **[Complete Module Documentation](./docs/MODULES.md)** - Detailed documentation for all 11 modules
+- **[API Documentation](./docs/API.md)** - Complete API reference with endpoints and examples
 - **[User Guide](./docs/USER_GUIDE.md)** - How to use the application
 - **[Tech Stack](./docs/tech-stack.md)** - Detailed technology overview
 - **[Flowcharts](./docs/flowcharts.md)** - Visual system diagrams
