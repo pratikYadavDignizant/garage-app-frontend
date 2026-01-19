@@ -40,6 +40,7 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
     reset,
   } = useForm<RegistrationFormData>({
@@ -121,6 +122,10 @@ export default function RegisterPage() {
                     placeholder="9876543210"
                     className="pl-10"
                     {...register("phoneNumber")}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+                      setValue("phoneNumber", value);
+                    }}
                     disabled={submitRegistration.isPending}
                     maxLength={10}
                   />
@@ -268,7 +273,7 @@ export default function RegisterPage() {
                   placeholder="9876543210"
                   value={statusPhone}
                   onChange={(e) => {
-                    setStatusPhone(e.target.value);
+                    setStatusPhone(e.target.value.replace(/\D/g, ""));
                     setCheckEnabled(false);
                   }}
                   maxLength={10}

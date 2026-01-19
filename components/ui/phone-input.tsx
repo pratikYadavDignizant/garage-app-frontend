@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface PhoneInputProps {
   countryCode: string;
@@ -14,12 +14,12 @@ interface PhoneInputProps {
 }
 
 const COUNTRY_CODES = [
-  { code: '+91', label: '🇮🇳 +91', country: 'India' },
-  { code: '+1', label: '🇺🇸 +1', country: 'USA/Canada' },
-  { code: '+44', label: '🇬🇧 +44', country: 'UK' },
-  { code: '+971', label: '🇦🇪 +971', country: 'UAE' },
-  { code: '+65', label: '🇸🇬 +65', country: 'Singapore' },
-  { code: '+61', label: '🇦🇺 +61', country: 'Australia' },
+  { code: "+91", label: "🇮🇳 +91", country: "India" },
+  { code: "+1", label: "🇺🇸 +1", country: "USA/Canada" },
+  { code: "+44", label: "🇬🇧 +44", country: "UK" },
+  { code: "+971", label: "🇦🇪 +971", country: "UAE" },
+  { code: "+65", label: "🇸🇬 +65", country: "Singapore" },
+  { code: "+61", label: "🇦🇺 +61", country: "Australia" },
 ];
 
 export function PhoneInput({
@@ -49,9 +49,12 @@ export function PhoneInput({
         </select>
         <Input
           type="tel"
-          value={phoneNumber}
-          onChange={(e) => onPhoneNumberChange(e.target.value)}
           placeholder="9876543210"
+          value={phoneNumber}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, "");
+            onPhoneNumberChange(value);
+          }}
           disabled={disabled}
           className="flex-1"
         />

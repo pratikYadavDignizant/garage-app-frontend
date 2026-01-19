@@ -58,7 +58,9 @@ export default function LoginPage() {
                     placeholder="+1234567890"
                     className="pl-10"
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onChange={(e) =>
+                      setPhoneNumber(e.target.value.replace(/\D/g, ""))
+                    }
                     required
                     disabled={isLoading}
                   />

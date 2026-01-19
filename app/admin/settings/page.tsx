@@ -92,7 +92,10 @@ export default function SettingsPage() {
               <Input
                 value={formData.phone}
                 onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
+                  setFormData({
+                    ...formData,
+                    phone: e.target.value.replace(/\D/g, ""),
+                  })
                 }
                 placeholder="10 digit phone number"
                 required
