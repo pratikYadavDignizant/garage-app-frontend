@@ -9,6 +9,7 @@ export interface Customer {
     countryCode?: string;
     phoneNumber?: string;
     address?: string;
+    garageId?: string;
 }
 
 export interface PaginatedResponse<T> {

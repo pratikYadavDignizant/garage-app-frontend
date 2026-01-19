@@ -43,6 +43,7 @@ import {
   useDeleteCustomer,
   Customer,
 } from "@/hooks/api/use-customers";
+import { useGarages } from "@/hooks/api/use-garages";
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal";
 import {
   useEntityDelete,
@@ -57,6 +58,7 @@ const customerSchema = z.object({
     .string()
     .regex(/^\d{7,15}$/, "Phone number must be 7-15 digits"),
   address: z.string().optional(),
+  garageId: z.string().optional(),
 });
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
@@ -74,6 +76,7 @@ export default function CustomersPage() {
   const createMutation = useCreateCustomer();
   const updateMutation = useUpdateCustomer();
   const deleteMutation = useEntityDelete("customers", ["customers"]);
+  const { data: garagesData } = useGarages(1, 100);
 
   const {
     register,
@@ -88,6 +91,7 @@ export default function CustomersPage() {
     defaultValues: {
       countryCode: "+91",
       phoneNumber: "",
+      garageId: "",
     },
   });
 
@@ -95,9 +99,15 @@ export default function CustomersPage() {
   const phoneNumber = watch("phoneNumber");
 
   const onSubmit = (values: CustomerFormValues) => {
+    // Sanitize garageId: remove if empty string to avoid sending invalid data
+    const payload = {
+      ...values,
+      garageId: values.garageId || undefined,
+    };
+
     if (currentCustomer) {
       updateMutation.mutate(
-        { id: currentCustomer.id, ...values },
+        { id: currentCustomer.id, ...payload },
         {
           onSuccess: () => {
             setIsEditOpen(false);
@@ -107,7 +117,7 @@ export default function CustomersPage() {
         },
       );
     } else {
-      createMutation.mutate(values, {
+      createMutation.mutate(payload, {
         onSuccess: () => {
           setIsAddOpen(false);
           reset();
@@ -118,7 +128,13 @@ export default function CustomersPage() {
 
   const openAdd = () => {
     setCurrentCustomer(null);
-    reset({ name: "", countryCode: "+91", phoneNumber: "", address: "" });
+    reset({
+      name: "",
+      countryCode: "+91",
+      phoneNumber: "",
+      address: "",
+      garageId: "",
+    });
     setIsAddOpen(true);
   };
 
@@ -130,6 +146,7 @@ export default function CustomersPage() {
       phoneNumber:
         customer.phoneNumber || customer.phone?.replace(/^\+\d{1,4}/, "") || "",
       address: customer.address || "",
+      garageId: customer.garageId || "",
     });
     setIsEditOpen(true);
   };
@@ -340,6 +357,25 @@ export default function CustomersPage() {
                 className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300"
                 placeholder="e.g. 123 Street, City"
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="garageId">Assigned Garage</Label>
+              <div className="relative">
+                <select
+                  id="garageId"
+                  {...register("garageId")}
+                  className={cn(
+                    "flex h-10 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300",
+                  )}
+                >
+                  <option value="">Select a garage...</option>
+                  {garagesData?.data?.map((garage) => (
+                    <option key={garage.id} value={garage.id}>
+                      {garage.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <DialogFooter>
               <Button
