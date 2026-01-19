@@ -53,6 +53,23 @@ export function useVehicle(id: string) {
 
 
 
+export function useCreateVehicle() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (data: Omit<Vehicle, 'id' | 'createdAt' | 'customer'>) => {
+            const response = await api.post('/admin/vehicles', data);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['vehicles'] });
+            toast.success('Vehicle created successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.error || 'Failed to create vehicle');
+        },
+    });
+}
 export function useUpdateVehicle() {
     const queryClient = useQueryClient();
 

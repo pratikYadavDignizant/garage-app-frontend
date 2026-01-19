@@ -41,6 +41,7 @@ import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
   useVehicles,
+  useCreateVehicle,
   useUpdateVehicle,
   useDeleteVehicle,
   Vehicle,
@@ -63,11 +64,13 @@ type VehicleFormValues = {
 
 export default function VehiclesPage() {
   const router = useRouter();
+  const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [currentVehicle, setCurrentVehicle] = useState<Vehicle | null>(null);
   const [customerSearch, setCustomerSearch] = useState("");
 
   const { data, isLoading } = useVehicles();
+  const createMutation = useCreateVehicle();
   const updateMutation = useUpdateVehicle();
   const deleteMutation = useDeleteVehicle();
   const { data: searchResults, isLoading: isSearching } =
@@ -107,7 +110,28 @@ export default function VehiclesPage() {
           },
         },
       );
+    } else {
+      // @ts-ignore - vehicle payload doesn't need id
+      createMutation.mutate(payload, {
+        onSuccess: () => {
+          setIsAddOpen(false);
+          reset();
+          setCustomerSearch("");
+        },
+      });
     }
+  };
+
+  const openAdd = () => {
+    setCurrentVehicle(null);
+    reset({
+      customerId: "",
+      model: "",
+      numberPlate: "",
+      defaultOilIntervalMonths: "6",
+    });
+    setCustomerSearch("");
+    setIsAddOpen(true);
   };
 
   const openEdit = (vehicle: Vehicle) => {
@@ -253,6 +277,11 @@ export default function VehiclesPage() {
           { label: "Dashboard", href: "/admin/dashboard" },
           { label: "Vehicles" },
         ]}
+        actions={
+          <Button onClick={openAdd}>
+            <Plus className="mr-2 h-4 w-4" /> Add Vehicle
+          </Button>
+        }
       />
 
       <DataTable
@@ -262,10 +291,20 @@ export default function VehiclesPage() {
         loading={isLoading}
       />
 
-      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+      <Dialog
+        open={isAddOpen || isEditOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsAddOpen(false);
+            setIsEditOpen(false);
+          }
+        }}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Vehicle</DialogTitle>
+            <DialogTitle>
+              {isEditOpen ? "Edit Vehicle" : "Add New Vehicle"}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
@@ -395,12 +434,22 @@ export default function VehiclesPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsEditOpen(false)}
+                onClick={() => {
+                  setIsAddOpen(false);
+                  setIsEditOpen(false);
+                }}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={updateMutation.isPending}>
-                {updateMutation.isPending ? "Saving..." : "Save Changes"}
+              <Button
+                type="submit"
+                disabled={createMutation.isPending || updateMutation.isPending}
+              >
+                {createMutation.isPending || updateMutation.isPending
+                  ? "Saving..."
+                  : isEditOpen
+                    ? "Save Changes"
+                    : "Add Vehicle"}
               </Button>
             </DialogFooter>
           </form>
