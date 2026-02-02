@@ -53,7 +53,7 @@ import {
   ServiceItem,
   calculateTotalCost,
 } from "@/hooks/api/use-services";
-import { useSendReminder } from "@/hooks/api/use-reminders";
+import { useSendInvoice } from "@/hooks/api/use-invoices";
 import { useVehicles } from "@/hooks/api/use-vehicles";
 
 const serviceSchema = z.object({
@@ -85,7 +85,7 @@ export default function ServicesPage() {
   const [vehicleSearch, setVehicleSearch] = useState("");
   const { data, isLoading } = useServices();
   const createMutation = useCreateService();
-  const sendReminder = useSendReminder();
+  const sendInvoice = useSendInvoice();
 
   // Fetch vehicles for selection
   const { data: allVehicles, isLoading: isVehiclesLoading } = useVehicles();
@@ -145,8 +145,8 @@ export default function ServicesPage() {
     );
   };
 
-  const handleSendReminder = (serviceId: string) => {
-    sendReminder.mutate(serviceId);
+  const handleSendInvoice = (serviceId: string) => {
+    sendInvoice.mutate(serviceId);
   };
 
   const columns: ColumnDef<Service>[] = [
@@ -253,12 +253,12 @@ export default function ServicesPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleSendReminder(service.id)}
-              disabled={sendReminder.isPending}
+              onClick={() => handleSendInvoice(service.id)}
+              disabled={sendInvoice.isPending}
               className="h-8"
             >
               <Send className="mr-1.5 h-3.5 w-3.5" />
-              Remind
+              Send Invoice
             </Button>
             <Button
               variant="ghost"
