@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 export function useSendInvoice() {
     return useMutation({
         mutationFn: async (serviceId: string) => {
-            const response = await api.post(`/admin/invoices/send/${serviceId}`);
+            const response = await api.post(`/invoices/${serviceId}/send`);
             return response.data;
         },
         onSuccess: () => {
