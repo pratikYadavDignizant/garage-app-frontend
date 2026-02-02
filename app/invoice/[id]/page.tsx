@@ -120,8 +120,8 @@ export default function InvoicePage() {
       </div>
 
       {/* Invoice Container */}
-      <div className="min-h-screen bg-slate-50 print:bg-white py-8 print:py-0">
-        <div className="max-w-5xl mx-auto bg-white shadow-lg print:shadow-none">
+      <div className="min-h-screen bg-slate-50 print:bg-white py-8 print:py-0 text-slate-900">
+        <div className="max-w-5xl mx-auto bg-white shadow-lg print:shadow-none text-slate-900">
           {/* A4 Paper Simulation */}
           <div className="p-8 print:p-6">
             {/* Header - Logo and Company Details */}
@@ -133,7 +133,7 @@ export default function InvoicePage() {
                 </div>
 
                 {/* Company Details */}
-                <div className="text-right text-sm">
+                <div className="text-right text-sm text-slate-900">
                   <p className="font-semibold">
                     {invoice.garage.address || "Address"}
                   </p>
@@ -154,7 +154,7 @@ export default function InvoicePage() {
             {/* Bill To and Order Details Grid */}
             <div className="border-x border-b border-slate-900 grid grid-cols-2">
               {/* Bill To Section */}
-              <div className="border-r border-slate-900 p-3">
+              <div className="border-r border-slate-900 p-3 text-slate-900">
                 <p className="text-sm font-semibold mb-2">Bill To:</p>
                 <p className="text-base font-bold">{invoice.customer.name}</p>
                 <p className="text-sm">{invoice.customer.address || "N/A"}</p>
@@ -171,7 +171,7 @@ export default function InvoicePage() {
               </div>
 
               {/* Order Details Section */}
-              <div className="p-3">
+              <div className="p-3 text-slate-900">
                 <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                   <div className="p-2">
                     <p className="text-slate-600">Invoice No.</p>
@@ -234,13 +234,13 @@ export default function InvoicePage() {
                 <tbody>
                   {invoice.items.map((item) => (
                     <tr key={item.sno}>
-                      <td className="border border-slate-300 p-2 text-sm text-center">
+                      <td className="border border-slate-300 p-2 text-sm text-center text-slate-900">
                         {item.sno}
                       </td>
-                      <td className="border border-slate-300 p-2 text-sm">
+                      <td className="border border-slate-300 p-2 text-sm text-slate-900">
                         {item.description}
                       </td>
-                      <td className="border border-slate-300 p-2 text-sm text-right font-mono">
+                      <td className="border border-slate-300 p-2 text-sm text-right font-mono text-slate-900">
                         ₹
                         {item.amount.toLocaleString("en-IN", {
                           minimumFractionDigits: 2,
@@ -265,11 +265,11 @@ export default function InvoicePage() {
                   <tr className="bg-slate-100">
                     <td
                       colSpan={2}
-                      className="border border-slate-300 p-2 text-sm font-bold text-right"
+                      className="border border-slate-300 p-2 text-sm font-bold text-right text-slate-900"
                     >
                       Total:
                     </td>
-                    <td className="border border-slate-300 p-2 text-sm font-bold text-right font-mono">
+                    <td className="border border-slate-300 p-2 text-sm font-bold text-right font-mono text-slate-900">
                       ₹
                       {invoice.summary.subtotal.toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
@@ -381,10 +381,17 @@ export default function InvoicePage() {
 
       {/* Print Styles */}
       <style jsx global>{`
+        /* Force light mode colors for invoice page */
+        body {
+          color: #0f172a !important;
+        }
+
         @media print {
           body {
             margin: 0;
             padding: 0;
+            color: #0f172a !important;
+            background: white !important;
           }
           @page {
             margin: 1cm;
