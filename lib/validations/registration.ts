@@ -1,22 +1,8 @@
 import { z } from 'zod';
-
-// Phone number validation (10 digits, numeric only)
-export const phoneNumberSchema = z
-    .string()
-    .trim()
-    .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits');
-
-// Country code validation
-export const countryCodeSchema = z
-    .string()
-    .trim()
-    .regex(/^\+\d{1,4}$/, 'Invalid country code')
-    .default('+91');
+import { phoneFieldsSchema } from './phone';
 
 // Registration form validation
 export const registrationSchema = z.object({
-    countryCode: countryCodeSchema,
-    phoneNumber: phoneNumberSchema,
     name: z
         .string()
         .trim()
@@ -35,7 +21,7 @@ export const registrationSchema = z.object({
         .email('Invalid email address')
         .optional()
         .or(z.literal('')),
-});
+}).and(phoneFieldsSchema);
 
 export type RegistrationFormData = z.infer<typeof registrationSchema>;
 
@@ -51,9 +37,6 @@ export const rejectReasonSchema = z.object({
 export type RejectReasonFormData = z.infer<typeof rejectReasonSchema>;
 
 // Status check validation
-export const statusCheckSchema = z.object({
-    countryCode: countryCodeSchema,
-    phoneNumber: phoneNumberSchema,
-});
+export const statusCheckSchema = phoneFieldsSchema;
 
 export type StatusCheckFormData = z.infer<typeof statusCheckSchema>;

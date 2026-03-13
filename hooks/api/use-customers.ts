@@ -72,7 +72,9 @@ export function useCreateCustomer() {
             toast.success('Customer created successfully');
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.error || 'Failed to create customer');
+            const err = error.response?.data;
+            const msg = err?.message ?? err?.error ?? 'Failed to create customer';
+            toast.error(typeof msg === 'string' ? msg : 'Failed to create customer');
         },
     });
 }
@@ -90,7 +92,9 @@ export function useUpdateCustomer() {
             toast.success('Customer updated successfully');
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.error || 'Failed to update customer');
+            const err = error.response?.data;
+            const msg = err?.message ?? err?.error ?? 'Failed to update customer';
+            toast.error(typeof msg === 'string' ? msg : 'Failed to update customer');
         },
     });
 }
@@ -107,7 +111,9 @@ export function useDeleteCustomer() {
             toast.success('Customer deleted successfully');
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.error || 'Failed to delete customer');
+            const err = error.response?.data;
+            const msg = err?.message ?? err?.error ?? 'Failed to delete customer';
+            toast.error(typeof msg === 'string' ? msg : 'Failed to delete customer');
         },
     });
 }

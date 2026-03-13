@@ -47,21 +47,20 @@ import {
   useToggleGarageStatus,
   Garage,
 } from "@/hooks/api/use-garages";
+import { phoneFieldsSchema } from "@/lib/validations/phone";
 import {
   useEntityDelete,
   getEntityDeletePreview,
   EntityDeletePreview,
 } from "@/hooks/api/use-entity-delete";
 
-const garageSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  countryCode: z.string().regex(/^\+\d{1,4}$/, "Invalid country code"),
-  phoneNumber: z
-    .string()
-    .regex(/^\d{7,15}$/, "Phone number must be 7-15 digits"),
-  address: z.string().optional(),
-  gstNumber: z.string().optional(),
-});
+const garageSchema = z
+  .object({
+    name: z.string().min(2, "Name must be at least 2 characters"),
+    address: z.string().optional(),
+    gstNumber: z.string().optional(),
+  })
+  .and(phoneFieldsSchema);
 
 type GarageFormValues = z.infer<typeof garageSchema>;
 

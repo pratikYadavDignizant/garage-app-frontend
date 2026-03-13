@@ -64,7 +64,9 @@ export function useUpdateGarage() {
             toast.success('Garage updated successfully');
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to update garage');
+            const err = error.response?.data;
+            const msg = err?.message ?? err?.error ?? 'Failed to update garage';
+            toast.error(typeof msg === 'string' ? msg : 'Failed to update garage');
         },
     });
 }
@@ -132,7 +134,9 @@ export function useCreateGarage() {
             toast.success('Garage created successfully');
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to create garage');
+            const err = error.response?.data;
+            const msg = err?.message ?? err?.error ?? 'Failed to create garage';
+            toast.error(typeof msg === 'string' ? msg : 'Failed to create garage');
         },
     });
 }
