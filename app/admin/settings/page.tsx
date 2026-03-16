@@ -20,6 +20,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { GST_REGEX, GST_FORMAT_MESSAGE } from "@/lib/validations/gst";
 
 export default function SettingsPage() {
   const { data: settings, isLoading } = useSettings();
@@ -31,16 +32,32 @@ export default function SettingsPage() {
     phone: "",
     gstNumber: "",
   });
+  const [gstError, setGstError] = useState("");
 
-  // Sync form data with fetched settings
+  // Sync form data with fetched settings + validate existing GST
   useEffect(() => {
     if (settings) {
       setFormData(settings);
+      if (settings.gstNumber) {
+        validateGst(settings.gstNumber);
+      }
     }
   }, [settings]);
 
+  const validateGst = (value: string): boolean => {
+    if (!value) return true; // optional field
+    const upper = value.toUpperCase();
+    if (!GST_REGEX.test(upper)) {
+      setGstError(GST_FORMAT_MESSAGE);
+      return false;
+    }
+    setGstError("");
+    return true;
+  };
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateGst(formData.gstNumber || "")) return;
     updateSettings.mutate(formData);
   };
 
@@ -121,11 +138,19 @@ export default function SettingsPage() {
               </label>
               <Input
                 value={formData.gstNumber}
-                onChange={(e) =>
-                  setFormData({ ...formData, gstNumber: e.target.value })
-                }
+                onChange={(e) => {
+                  const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                  setFormData({ ...formData, gstNumber: value });
+                  if (gstError) validateGst(value);
+                }}
+                onBlur={() => validateGst(formData.gstNumber || "")}
                 placeholder="e.g. 29ABCDE1234F1Z5"
+                maxLength={15}
+                className={gstError ? "border-red-500" : ""}
               />
+              {gstError && (
+                <p className="text-sm text-red-600">{gstError}</p>
+              )}
             </div>
           </div>
 

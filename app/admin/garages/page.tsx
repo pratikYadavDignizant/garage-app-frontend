@@ -48,6 +48,7 @@ import {
   Garage,
 } from "@/hooks/api/use-garages";
 import { phoneFieldsSchema } from "@/lib/validations/phone";
+import { gstNumberSchema } from "@/lib/validations/gst";
 import {
   useEntityDelete,
   getEntityDeletePreview,
@@ -58,7 +59,7 @@ const garageSchema = z
   .object({
     name: z.string().min(2, "Name must be at least 2 characters"),
     address: z.string().optional(),
-    gstNumber: z.string().optional(),
+    gstNumber: gstNumberSchema,
   })
   .and(phoneFieldsSchema);
 
@@ -409,8 +410,12 @@ export default function GaragesPage() {
               <Input
                 id="gstNumber"
                 {...register("gstNumber")}
-                placeholder="e.g. 29ABCDE1234F1ZO"
+                placeholder="e.g. 29ABCDE1234F1Z5"
+                className={errors.gstNumber ? "border-red-500" : ""}
               />
+              {errors.gstNumber && (
+                <p className="text-sm text-red-600">{errors.gstNumber.message}</p>
+              )}
             </div>
             <DialogFooter>
               <Button

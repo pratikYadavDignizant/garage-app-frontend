@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { phoneFieldsSchema } from './phone';
+import { gstNumberSchema } from './gst';
 
 // Registration form validation
 export const registrationSchema = z.object({
@@ -9,12 +10,7 @@ export const registrationSchema = z.object({
         .min(1, 'Name is required')
         .max(100, 'Name must be less than 100 characters'),
     address: z.string().trim().optional(),
-    gstNumber: z
-        .string()
-        .trim()
-        .regex(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, 'Invalid GST number format')
-        .optional()
-        .or(z.literal('')),
+    gstNumber: gstNumberSchema,
     email: z
         .string()
         .trim()
