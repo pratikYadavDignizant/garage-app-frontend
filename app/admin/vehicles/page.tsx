@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -22,6 +23,7 @@ import {
   Loader2,
   Eye,
   X,
+  AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { exportToCSV } from "@/lib/export";
@@ -43,15 +45,21 @@ import {
   useVehicles,
   useCreateVehicle,
   useUpdateVehicle,
-  useDeleteVehicle,
   Vehicle,
 } from "@/hooks/api/use-vehicles";
 import { useSearchCustomers } from "@/hooks/api/use-customers";
+import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal";
+import {
+  useEntityDelete,
+  getEntityDeletePreview,
+  EntityDeletePreview,
+} from "@/hooks/api/use-entity-delete";
+import { numberPlateSchema, vehicleModelSchema } from "@/lib/validations/vehicle";
 
 const vehicleSchema = z.object({
   customerId: z.string().min(1, "Customer is required"),
-  model: z.string().min(2, "Model is required"),
-  numberPlate: z.string().min(3, "Number plate is required"),
+  model: vehicleModelSchema,
+  numberPlate: numberPlateSchema,
   defaultOilIntervalMonths: z.enum(["1", "2", "3", "6"]).transform(Number),
 });
 
@@ -68,11 +76,15 @@ export default function VehiclesPage() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [currentVehicle, setCurrentVehicle] = useState<Vehicle | null>(null);
   const [customerSearch, setCustomerSearch] = useState("");
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletePreview, setDeletePreview] =
+    useState<EntityDeletePreview | null>(null);
+  const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null);
 
   const { data, isLoading } = useVehicles();
   const createMutation = useCreateVehicle();
   const updateMutation = useUpdateVehicle();
-  const deleteMutation = useDeleteVehicle();
+  const deleteMutation = useEntityDelete("vehicles", ["vehicles"]);
   const { data: searchResults, isLoading: isSearching } =
     useSearchCustomers(customerSearch);
 
@@ -85,6 +97,7 @@ export default function VehiclesPage() {
     formState: { errors },
   } = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleSchema as any),
+    mode: "onChange",
     defaultValues: {
       defaultOilIntervalMonths: "6",
     },
@@ -146,9 +159,28 @@ export default function VehiclesPage() {
     setIsEditOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this vehicle?")) {
-      deleteMutation.mutate(id);
+  const handleDelete = async (id: string, vehicleName: string) => {
+    try {
+      const preview = await getEntityDeletePreview("vehicles", id);
+      setDeletePreview({ ...preview, entityName: vehicleName });
+      setVehicleToDelete(id);
+      setDeleteModalOpen(true);
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.error || "Failed to get deletion preview",
+      );
+    }
+  };
+
+  const confirmDelete = () => {
+    if (vehicleToDelete) {
+      deleteMutation.mutate(vehicleToDelete, {
+        onSuccess: () => {
+          setDeleteModalOpen(false);
+          setVehicleToDelete(null);
+          setDeletePreview(null);
+        },
+      });
     }
   };
 
@@ -239,7 +271,7 @@ export default function VehiclesPage() {
               variant="ghost"
               size="icon"
               className="h-8 w-8"
-              onClick={() => handleDelete(vehicle.id)}
+              onClick={() => handleDelete(vehicle.id, `${vehicle.model} (${vehicle.numberPlate})`)}
               disabled={deleteMutation.isPending}
             >
               <Trash2 className="h-4 w-4 text-red-500" />
@@ -291,6 +323,15 @@ export default function VehiclesPage() {
         loading={isLoading}
       />
 
+      <DeleteConfirmationModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        onConfirm={confirmDelete}
+        previewData={deletePreview}
+        isLoading={deleteMutation.isPending}
+        entityType="Vehicle"
+      />
+
       <Dialog
         open={isAddOpen || isEditOpen}
         onOpenChange={(open) => {
@@ -308,7 +349,7 @@ export default function VehiclesPage() {
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label>Assign Customer</Label>
+              <Label required>Assign Customer</Label>
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
                 <Input
@@ -388,10 +429,16 @@ export default function VehiclesPage() {
                 <Input
                   id="model"
                   {...register("model")}
-                  placeholder="e.g. Toyota Corolla"
+                  placeholder="e.g. Maruti Swift or Honda City 2024"
+                  className={cn(
+                    errors.model && "border-red-500 focus-visible:ring-red-500",
+                  )}
                 />
                 {errors.model && (
-                  <p className="text-xs text-red-500">{errors.model.message}</p>
+                  <p className="text-xs text-red-500 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.model.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
@@ -402,9 +449,13 @@ export default function VehiclesPage() {
                   id="numberPlate"
                   {...register("numberPlate")}
                   placeholder="e.g. KA-01-AB-1234"
+                  className={cn(
+                    errors.numberPlate && "border-red-500 focus-visible:ring-red-500",
+                  )}
                 />
                 {errors.numberPlate && (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-red-500 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
                     {errors.numberPlate.message}
                   </p>
                 )}
