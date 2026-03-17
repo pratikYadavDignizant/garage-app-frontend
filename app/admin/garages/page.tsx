@@ -33,6 +33,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { PageHeader } from "@/components/ui/page-header";
@@ -49,6 +50,7 @@ import {
 } from "@/hooks/api/use-garages";
 import { phoneFieldsSchema } from "@/lib/validations/phone";
 import { gstNumberSchema } from "@/lib/validations/gst";
+import { garageNameSchema } from "@/lib/validations/garage";
 import {
   useEntityDelete,
   getEntityDeletePreview,
@@ -57,8 +59,8 @@ import {
 
 const garageSchema = z
   .object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
-    address: z.string().optional(),
+    name: garageNameSchema,
+    address: z.string().trim().optional(),
     gstNumber: gstNumberSchema,
   })
   .and(phoneFieldsSchema);
@@ -286,9 +288,9 @@ export default function GaragesPage() {
               disabled={toggleStatus.isPending}
             >
               {garage.isActive ? (
-                <PowerOff className="h-4 w-4 text-amber-500" />
-              ) : (
                 <Power className="h-4 w-4 text-green-500" />
+              ) : (
+                <PowerOff className="h-4 w-4 text-red-500" />
               )}
             </Button>
             <Button
@@ -364,7 +366,7 @@ export default function GaragesPage() {
                 <Input
                   id="name"
                   {...register("name")}
-                  placeholder="e.g. City Auto Care"
+                  placeholder="e.g. Garage 123 or City Auto Care"
                   className={cn(
                     errors.name && "border-red-500 focus-visible:ring-red-500",
                     !errors.name &&
@@ -372,11 +374,6 @@ export default function GaragesPage() {
                       watch("name") &&
                       "border-green-500 focus-visible:ring-green-500",
                   )}
-                  onKeyPress={(e) => {
-                    if (!/[a-zA-Z\s\-']/.test(e.key)) {
-                      e.preventDefault();
-                    }
-                  }}
                 />
                 {!errors.name && touchedFields.name && watch("name") && (
                   <CheckCircle2 className="absolute right-3 top-2.5 h-5 w-5 text-green-500" />
@@ -399,11 +396,21 @@ export default function GaragesPage() {
             />
             <div className="space-y-2">
               <Label htmlFor="address">Address</Label>
-              <Input
+              <Textarea
                 id="address"
                 {...register("address")}
                 placeholder="e.g. MG Road, Bangalore"
+                rows={3}
+                className={cn(
+                  errors.address && "border-red-500 focus-visible:ring-red-500",
+                )}
               />
+              {errors.address && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.address.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="gstNumber">GST Number</Label>
@@ -411,10 +418,19 @@ export default function GaragesPage() {
                 id="gstNumber"
                 {...register("gstNumber")}
                 placeholder="e.g. 29ABCDE1234F1Z5"
-                className={errors.gstNumber ? "border-red-500" : ""}
+                className={cn(
+                  errors.gstNumber && "border-red-500 focus-visible:ring-red-500",
+                  !errors.gstNumber &&
+                    touchedFields.gstNumber &&
+                    watch("gstNumber") &&
+                    "border-green-500 focus-visible:ring-green-500",
+                )}
               />
               {errors.gstNumber && (
-                <p className="text-sm text-red-600">{errors.gstNumber.message}</p>
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.gstNumber.message}
+                </p>
               )}
             </div>
             <DialogFooter>

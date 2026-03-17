@@ -1,14 +1,11 @@
 import { z } from 'zod';
 import { phoneFieldsSchema } from './phone';
 import { gstNumberSchema } from './gst';
+import { garageNameSchema } from './garage';
 
 // Registration form validation
 export const registrationSchema = z.object({
-    name: z
-        .string()
-        .trim()
-        .min(1, 'Name is required')
-        .max(100, 'Name must be less than 100 characters'),
+    name: garageNameSchema.pipe(z.string().max(100, 'Name must be less than 100 characters')),
     address: z.string().trim().optional(),
     gstNumber: gstNumberSchema,
     email: z

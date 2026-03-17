@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { StatusBadge } from "@/components/ui/status-badge";
 import {
@@ -21,7 +22,6 @@ import {
   Store,
   Phone,
   Mail,
-  MapPin,
   FileText,
   CheckCircle2,
   Loader2,
@@ -164,17 +164,13 @@ export default function RegisterPage() {
             {/* Address */}
             <div>
               <Label htmlFor="address">Address (Optional)</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <Input
-                  id="address"
-                  type="text"
-                  placeholder="123 Street, City, State"
-                  className="pl-10"
-                  {...register("address")}
-                  disabled={submitRegistration.isPending}
-                />
-              </div>
+              <Textarea
+                id="address"
+                placeholder="123 Street, City, State"
+                rows={3}
+                {...register("address")}
+                disabled={submitRegistration.isPending}
+              />
               {errors.address && (
                 <p className="mt-1 text-xs text-red-500">
                   {errors.address.message}

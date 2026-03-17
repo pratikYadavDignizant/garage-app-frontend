@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { PageHeader } from "@/components/ui/page-header";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,9 @@ import {
   Loader2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { GST_REGEX, GST_FORMAT_MESSAGE } from "@/lib/validations/gst";
+import { GARAGE_NAME_REGEX, GARAGE_NAME_MESSAGE } from "@/lib/validations/garage";
 
 export default function SettingsPage() {
   const { data: settings, isLoading } = useSettings();
@@ -33,19 +35,10 @@ export default function SettingsPage() {
     gstNumber: "",
   });
   const [gstError, setGstError] = useState("");
+  const [nameError, setNameError] = useState("");
 
-  // Sync form data with fetched settings + validate existing GST
-  useEffect(() => {
-    if (settings) {
-      setFormData(settings);
-      if (settings.gstNumber) {
-        validateGst(settings.gstNumber);
-      }
-    }
-  }, [settings]);
-
-  const validateGst = (value: string): boolean => {
-    if (!value) return true; // optional field
+  const validateGst = useCallback((value: string): boolean => {
+    if (!value) { setGstError(""); return true; }
     const upper = value.toUpperCase();
     if (!GST_REGEX.test(upper)) {
       setGstError(GST_FORMAT_MESSAGE);
@@ -53,11 +46,36 @@ export default function SettingsPage() {
     }
     setGstError("");
     return true;
-  };
+  }, []);
+
+  const validateName = useCallback((value: string): boolean => {
+    const trimmed = value.trim();
+    if (trimmed.length < 2) {
+      setNameError("Name must be at least 2 characters");
+      return false;
+    }
+    if (!GARAGE_NAME_REGEX.test(trimmed)) {
+      setNameError(GARAGE_NAME_MESSAGE);
+      return false;
+    }
+    setNameError("");
+    return true;
+  }, []);
+
+  // Sync form data with fetched settings + validate existing values
+  useEffect(() => {
+    if (settings) {
+      setFormData(settings);
+      if (settings.gstNumber) validateGst(settings.gstNumber);
+      if (settings.name) validateName(settings.name);
+    }
+  }, [settings, validateGst, validateName]);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateGst(formData.gstNumber || "")) return;
+    const nameValid = validateName(formData.name);
+    const gstValid = validateGst(formData.gstNumber || "");
+    if (!nameValid || !gstValid) return;
     updateSettings.mutate(formData);
   };
 
@@ -94,12 +112,18 @@ export default function SettingsPage() {
               </label>
               <Input
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, name: e.target.value });
+                  if (nameError) validateName(e.target.value);
+                }}
+                onBlur={() => validateName(formData.name)}
                 placeholder="e.g. Premium Auto Care"
                 required
+                className={nameError ? "border-red-500" : ""}
               />
+              {nameError && (
+                <p className="text-sm text-red-600">{nameError}</p>
+              )}
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center">
@@ -122,12 +146,13 @@ export default function SettingsPage() {
               <label className="text-sm font-medium flex items-center">
                 <MapPin className="h-4 w-4 mr-2 text-slate-400" /> Address
               </label>
-              <Input
+              <Textarea
                 value={formData.address}
                 onChange={(e) =>
                   setFormData({ ...formData, address: e.target.value })
                 }
                 placeholder="Full workshop address"
+                rows={3}
                 required
               />
             </div>
