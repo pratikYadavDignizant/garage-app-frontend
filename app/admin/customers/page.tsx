@@ -31,6 +31,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { PageHeader } from "@/components/ui/page-header";
@@ -51,12 +52,13 @@ import {
   EntityDeletePreview,
 } from "@/hooks/api/use-entity-delete";
 import { phoneFieldsSchema } from "@/lib/validations/phone";
+import { customerNameSchema } from "@/lib/validations/customer";
 
 const customerSchema = z
   .object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
-    address: z.string().optional(),
-    garageId: z.string().optional(),
+    name: customerNameSchema,
+    address: z.string().trim().max(500, "Address must be less than 500 characters").optional(),
+    garageId: z.string().min(1, "Please select a garage"),
   })
   .and(phoneFieldsSchema);
 
@@ -314,20 +316,14 @@ export default function CustomersPage() {
                 <Input
                   id="name"
                   {...register("name")}
-                  placeholder="Enter customer name"
+                  placeholder="e.g. Rushabh Rane or V. Kumar"
                   className={cn(
                     errors.name && "border-red-500 focus-visible:ring-red-500",
                     !errors.name &&
                       touchedFields.name &&
                       watch("name") &&
-                      "border-green-500 focus-visible:ring-green-500",
+                      "border-green-500 focus-visible:ring-green-500 pr-10",
                   )}
-                  onKeyPress={(e) => {
-                    // Only allow letters, spaces, hyphens, and apostrophes
-                    if (!/[a-zA-Z\s\-']/.test(e.key)) {
-                      e.preventDefault();
-                    }
-                  }}
                 />
                 {!errors.name && touchedFields.name && watch("name") && (
                   <CheckCircle2 className="absolute right-3 top-2.5 h-5 w-5 text-green-500" />
@@ -350,31 +346,47 @@ export default function CustomersPage() {
             />
             <div className="space-y-2">
               <Label htmlFor="address">Address</Label>
-              <textarea
+              <Textarea
                 id="address"
                 {...register("address")}
-                className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300"
                 placeholder="e.g. 123 Street, City"
+                rows={3}
+                className={cn(
+                  errors.address && "border-red-500 focus-visible:ring-red-500",
+                )}
               />
+              {errors.address && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.address.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="garageId">Assigned Garage</Label>
-              <div className="relative">
-                <select
-                  id="garageId"
-                  {...register("garageId")}
-                  className={cn(
-                    "flex h-10 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300",
-                  )}
-                >
-                  <option value="">Select a garage...</option>
-                  {garagesData?.data?.map((garage) => (
-                    <option key={garage.id} value={garage.id}>
-                      {garage.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Label htmlFor="garageId" required>Assigned Garage</Label>
+              <select
+                id="garageId"
+                {...register("garageId")}
+                className={cn(
+                  "flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm ring-offset-white focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-950 dark:ring-offset-slate-950 dark:focus:ring-slate-300 overflow-hidden text-ellipsis",
+                  errors.garageId
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-slate-200 focus:ring-slate-950 dark:border-slate-800",
+                )}
+              >
+                <option value="">Select a garage...</option>
+                {garagesData?.data?.map((garage) => (
+                  <option key={garage.id} value={garage.id}>
+                    {garage.name.length > 40 ? `${garage.name.slice(0, 40)}...` : garage.name}
+                  </option>
+                ))}
+              </select>
+              {errors.garageId && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.garageId.message}
+                </p>
+              )}
             </div>
             <DialogFooter>
               <Button

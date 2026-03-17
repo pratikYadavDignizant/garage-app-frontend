@@ -60,7 +60,7 @@ import {
 const garageSchema = z
   .object({
     name: garageNameSchema,
-    address: z.string().trim().optional(),
+    address: z.string().trim().max(500, "Address must be less than 500 characters").optional(),
     gstNumber: gstNumberSchema,
   })
   .and(phoneFieldsSchema);

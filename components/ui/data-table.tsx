@@ -3,7 +3,6 @@
 import * as React from "react";
 import {
   ColumnDef,
-  ColumnFiltersState,
   SortingState,
   VisibilityState,
   flexRender,
@@ -48,9 +47,7 @@ export function DataTable<TData, TValue>({
   loading,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
+  const [globalFilter, setGlobalFilter] = React.useState("");
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
@@ -59,7 +56,8 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: "includesString",
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -68,7 +66,7 @@ export function DataTable<TData, TValue>({
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
-      columnFilters,
+      globalFilter,
       columnVisibility,
       rowSelection,
     },
@@ -82,13 +80,9 @@ export function DataTable<TData, TValue>({
             <div className="relative w-[250px]">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-500" />
               <Input
-                placeholder={`Search...`}
-                value={
-                  (table.getColumn(searchKey)?.getFilterValue() as string) ?? ""
-                }
-                onChange={(event) =>
-                  table.getColumn(searchKey)?.setFilterValue(event.target.value)
-                }
+                placeholder="Search..."
+                value={globalFilter ?? ""}
+                onChange={(event) => setGlobalFilter(event.target.value)}
                 className="pl-9"
               />
             </div>

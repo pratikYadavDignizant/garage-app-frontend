@@ -152,13 +152,6 @@ export function DeleteConfirmationModal({
                 </p>
               </div>
             </div>
-
-            <div className="flex items-start space-x-2 text-red-600 dark:text-red-400">
-              <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-              <p className="font-medium">
-                This action CANNOT be undone!
-              </p>
-            </div>
           </div>
         </DialogHeader>
         <DialogFooter>
