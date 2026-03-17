@@ -33,7 +33,7 @@ export function PhoneInput({
 }: PhoneInputProps) {
   return (
     <div className="space-y-2">
-      <Label>Phone Number</Label>
+      <Label required>Phone Number</Label>
       <div className="flex gap-2">
         <select
           value={countryCode}

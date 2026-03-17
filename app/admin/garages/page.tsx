@@ -372,7 +372,7 @@ export default function GaragesPage() {
                     !errors.name &&
                       touchedFields.name &&
                       watch("name") &&
-                      "border-green-500 focus-visible:ring-green-500",
+                      "border-green-500 focus-visible:ring-green-500 pr-10",
                   )}
                 />
                 {!errors.name && touchedFields.name && watch("name") && (

@@ -18,6 +18,9 @@ export interface EntityDeletePreview {
 /**
  * Universal delete preview function
  * Works for any entity type (garages, customers, vehicles, services)
+ *
+ * Backend always returns 400 with preview data (counts of related records).
+ * Actual deletion only happens via useEntityDelete with ?confirm=true.
  */
 export async function getEntityDeletePreview(
     entityType: string,
@@ -25,14 +28,10 @@ export async function getEntityDeletePreview(
 ): Promise<EntityDeletePreview> {
     try {
         const response = await api.delete(`/admin/${entityType}/${id}`);
-        // If successful (no preview needed), entity was deleted
-        return {
-            message: 'Entity deleted successfully',
-            totalRecords: 0,
-        };
+        // Should not reach here — backend always returns 400 for preview
+        return response.data;
     } catch (error: any) {
         if (error.response?.status === 400 && error.response?.data) {
-            // Return preview data
             return error.response.data;
         }
         throw error;
