@@ -52,7 +52,7 @@ export function useEntityDelete(entityType: string, queryKey: string[]) {
         },
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey });
-            const message = data?.message || `${entityType} and all related data permanently deleted`;
+            const message = data?.message || `${entityType} deleted successfully`;
             toast.success(message);
         },
         onError: (error: any) => {

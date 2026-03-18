@@ -97,7 +97,7 @@ export default function VehiclesPage() {
     formState: { errors },
   } = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleSchema as any),
-    mode: "onChange",
+    mode: "onTouched",
     defaultValues: {
       defaultOilIntervalMonths: "6",
     },
@@ -205,7 +205,8 @@ export default function VehiclesPage() {
       ),
     },
     {
-      accessorKey: "customer",
+      id: "customer",
+      accessorFn: (row) => row.customer?.name || "N/A",
       header: "Customer",
       cell: ({ row }) => {
         const customer = row.original.customer;
@@ -354,7 +355,7 @@ export default function VehiclesPage() {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
                 <Input
                   placeholder="Search by name or phone..."
-                  className="pl-9"
+                  className={cn("pl-9", errors.customerId && !selectedCustomerId && "border-red-500 focus-visible:ring-red-500")}
                   value={customerSearch}
                   onChange={(e) => {
                     if (selectedCustomerId) {
@@ -415,7 +416,8 @@ export default function VehiclesPage() {
                   </div>
                 )}
               {errors.customerId && (
-                <p className="text-xs text-red-500">
+                <p className="text-xs text-red-500 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
                   {errors.customerId.message as string}
                 </p>
               )}
@@ -485,6 +487,7 @@ export default function VehiclesPage() {
               <Button
                 type="button"
                 variant="outline"
+                disabled={createMutation.isPending || updateMutation.isPending}
                 onClick={() => {
                   setIsAddOpen(false);
                   setIsEditOpen(false);

@@ -91,7 +91,7 @@ export default function GaragesPage() {
     formState: { errors, touchedFields },
   } = useForm<GarageFormValues>({
     resolver: zodResolver(garageSchema),
-    mode: "onChange", // Enable real-time validation
+    mode: "onTouched",
     defaultValues: {
       countryCode: "+91",
       phoneNumber: "",
@@ -437,6 +437,7 @@ export default function GaragesPage() {
               <Button
                 type="button"
                 variant="outline"
+                disabled={createMutation.isPending || updateGarage.isPending}
                 onClick={() => {
                   setIsAddOpen(false);
                   setIsEditOpen(false);

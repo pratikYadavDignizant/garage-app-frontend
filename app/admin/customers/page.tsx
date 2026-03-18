@@ -88,7 +88,7 @@ export default function CustomersPage() {
     formState: { errors, touchedFields },
   } = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
-    mode: "onChange", // Enable real-time validation
+    mode: "onTouched",
     defaultValues: {
       countryCode: "+91",
       phoneNumber: "",
@@ -392,6 +392,7 @@ export default function CustomersPage() {
               <Button
                 type="button"
                 variant="outline"
+                disabled={createMutation.isPending || updateMutation.isPending}
                 onClick={() => {
                   setIsAddOpen(false);
                   setIsEditOpen(false);

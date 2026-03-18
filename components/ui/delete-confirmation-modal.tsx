@@ -96,12 +96,12 @@ export function DeleteConfirmationModal({
         <DialogHeader>
           <div className="flex items-center space-x-2 text-red-600">
             <AlertTriangle className="h-5 w-5" />
-            <DialogTitle>Permanent Deletion Warning</DialogTitle>
+            <DialogTitle>Delete {entityType}</DialogTitle>
           </div>
           <div className="space-y-4 pt-4 text-sm text-slate-500 dark:text-slate-400">
             <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 space-y-2">
               <p className="font-medium text-red-900 dark:text-red-100">
-                This will permanently delete:
+                This will also delete:
               </p>
               <ul className="space-y-1 text-red-800 dark:text-red-200">
                 {previewData.entityName && (
